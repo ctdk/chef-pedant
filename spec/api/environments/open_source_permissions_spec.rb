@@ -188,8 +188,6 @@ describe 'Environments Endpoint Open Source Permission Checks', :platform => :op
     # An empty run list is the simplest thing that could work
     let(:request_payload){{'run_list' => []}}
 
-    should_not_allow_method :GET
-
     context 'POST' do
       let(:request_method){:POST}
       include_context 'permission checks' do
@@ -197,9 +195,16 @@ describe 'Environments Endpoint Open Source Permission Checks', :platform => :op
         let(:non_admin_response){ok_response}
       end
     end
+  end # /environments/<environment>/cookbook_versions
 
+    # Depsolver endpoint
+  context '/environments/<environment>/cookbook_versions-not allowed' do
+    let(:request_url){api_url("/environments/#{environment_name}/cookbook_versions")}
+    include_context 'with temporary testing environment'
+    # An empty run list is the simplest thing that could work
+    should_not_allow_method :GET
     should_not_allow_method :PUT
     should_not_allow_method :DELETE
-  end # /environments/<environment>/cookbook_versions
+  end # /environments/<environment>/cookbook_versions - not allowed
 
 end

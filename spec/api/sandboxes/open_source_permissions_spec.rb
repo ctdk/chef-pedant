@@ -58,9 +58,6 @@ describe 'Sandbox Endpoint Open Source Permission Checks', :platform => :open_so
       put(request_url, admin_requestor, :payload => request_payload)
     end
 
-    should_not_allow_method :GET
-    should_not_allow_method :POST
-
     context 'PUT' do
       let(:request_method){:PUT}
       include_context 'permission checks' do
@@ -69,7 +66,26 @@ describe 'Sandbox Endpoint Open Source Permission Checks', :platform => :open_so
       end
     end
 
+  end # /sandboxes/<sandbox>
+  context '/sandboxes/<sandbox>-not-allow' do
+    let(:sandbox_file){Pedant::Utility.new_random_file}
+    let(:sandbox){create_sandbox([sandbox_file])}
+    let(:request_url){sandbox['uri']}
+    r_p = { 'is_completed' => true }
+
+    before :each do
+      upload_to_sandbox(sandbox_file, sandbox)
+    end
+
+    after :each do
+      # Commit the sandbox as an admin, to ensure this is always done,
+      # to avoid leaving incomplete sandbox data in the database
+      put(request_url, admin_requestor, :payload => r_p)
+    end
+
+    should_not_allow_method :GET
+    should_not_allow_method :POST
     should_not_allow_method :DELETE
 
-  end # /sandboxes/<sandbox>
+  end # /sandboxes/<sandbox>-not-allow
 end

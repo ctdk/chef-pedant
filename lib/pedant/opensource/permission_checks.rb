@@ -67,7 +67,7 @@ module Pedant
           let(:admin_response){method_not_allowed_response}
           let(:non_admin_response){method_not_allowed_response}
           let(:validator_response){method_not_allowed_response}
-          let(:bad_client_response){method_not_allowed_response}
+          let(:bad_client_response){unauthorized_response}
         end
       end
 
@@ -81,7 +81,7 @@ module Pedant
               let(:admin_response)      { method_not_allowed_response }
               let(:non_admin_response)  { method_not_allowed_response }
               let(:validator_response)  { method_not_allowed_response }
-              let(:bad_client_response) { method_not_allowed_response }
+              let(:bad_client_response) { unauthorized_response }
             end
           end
         end
