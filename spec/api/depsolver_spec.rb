@@ -192,9 +192,9 @@ describe "Depsolver API endpoint", :depsolver do
       it "returns 412 with an existing cookbook filtered out by environment" do
         payload = "{\"run_list\":[\"#{cookbook_name}\"]}"
         error_hash = {
-          "message" => "Run list contains invalid items: no versions match the constraints on cookbook (foo >= 0.0.0).",
+          "message" => "Run list contains invalid items: no versions match the constraints on cookbook (foo = 400.0.0).",
           "non_existent_cookbooks" => [],
-          "cookbooks_with_no_versions" => ["(foo >= 0.0.0)"]
+          "cookbooks_with_no_versions" => ["(foo = 400.0.0)"]
         }
         post(api_url("/environments/#{no_cookbooks_env}/cookbook_versions"), admin_user,
              :payload => payload) do |response|
@@ -212,9 +212,9 @@ describe "Depsolver API endpoint", :depsolver do
         not_exist2 = "also_this_one"
         payload = "{\"run_list\":[\"#{not_exist1}\", \"#{not_exist2}\"]}"
         error_hash = {
-          "message" => "Run list contains invalid items: no such cookbooks #{not_exist1}, #{not_exist2}.",
-          "non_existent_cookbooks" => [ not_exist1, not_exist2 ],
-          "cookbooks_with_no_versions" => []
+          "cookbooks_with_no_versions" => [],
+          "message" => "Run list contains invalid items: no such cookbooks #{not_exist2}, #{not_exist1}.",
+          "non_existent_cookbooks" => [ not_exist2, not_exist1 ]
         }
         post(api_url("/environments/#{env}/cookbook_versions"), admin_user,
              :payload => payload) do |response|
@@ -230,9 +230,9 @@ describe "Depsolver API endpoint", :depsolver do
       it "returns 412 when there is a runlist entry specifying version that doesn't exist" do
         missing_version_payload = "{\"run_list\":[\"#{cookbook_name}@#{cookbook_version2}\"]}"
         error_hash = {
+          "cookbooks_with_no_versions" => ["(#{cookbook_name} = #{cookbook_version2})"],
           "message" => "Run list contains invalid items: no versions match the constraints on cookbook (#{cookbook_name} = #{cookbook_version2}).",
-          "non_existent_cookbooks" => [],
-          "cookbooks_with_no_versions" => ["(#{cookbook_name} = #{cookbook_version2})"]
+          "non_existent_cookbooks" => []
         }
         post(api_url("/environments/#{env}/cookbook_versions"), admin_user,
              :payload => missing_version_payload) do |response|
