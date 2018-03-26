@@ -252,9 +252,9 @@ describe "Depsolver API endpoint", :depsolver do
         not_exist = "this_does_not_exist"
         payload = "{\"run_list\":[\"#{not_exist}\", \"#{cookbook_name}@2.0.0\"]}"
         error_hash = {
-          "message" => "Run list contains invalid items: no such cookbook #{not_exist}.",
-          "non_existent_cookbooks" => [ not_exist ],
-          "cookbooks_with_no_versions" => []
+          "cookbooks_with_no_versions" => ["(#{cookbook_name} = 2.0.0)"],
+          "message" => "Run list contains invalid items: no such cookbook #{not_exist} no versions match the constraints on cookbook (#{cookbook_name} = 2.0.0).",
+          "non_existent_cookbooks" => [ not_exist ]
         }
         post(api_url("/environments/#{env}/cookbook_versions"), admin_user,
              :payload => payload) do |response|
@@ -286,12 +286,13 @@ describe "Depsolver API endpoint", :depsolver do
         make_cookbook(admin_user, cookbook_name, cookbook_version,opts)
         error_hash = {
           "message" => "Unable to satisfy constraints on package this_does_not_exist, " +
-                       "which does not exist, due to solution constraint (foo >= 0.0.0). " +
+                       "which does not exist, due to solution constraint (foo >= 0.1.0). " +
                        "Solution constraints that may result in a constraint on this_does_not_exist: " +
-                       "[(foo = 1.2.3) -> (this_does_not_exist >= 0.0.0)]",
-           "unsatisfiable_run_list_item" => "(foo >= 0.0.0)",
+                       "[(foo = 1.2.3) -> (this_does_not_exist >= 0.0.0)]\n" +
+		       "Run list contains invalid items: no such cookbook #{not_exist_name}.",
+          "most_constrained_cookbooks" => [],
           "non_existent_cookbooks" => ["this_does_not_exist"],
-          "most_constrained_cookbooks" => []
+          "unsatisfiable_run_list_item" => "(foo >= 0.1.0)"
         }
         post(api_url("/environments/#{env}/cookbook_versions"), admin_user,
              :payload => payload) do |response|
@@ -364,8 +365,8 @@ describe "Depsolver API endpoint", :depsolver do
       it "returns 412 when there is an impossible dependency" do
         opts1 = { :dependencies => {cookbook_name2=>"> 2.0.0"}}
         opts2 = { :dependencies => {cookbook_name=>"> 3.0.0"}}
-        make_cookbook(admin_user, cookbook_name, cookbook_version, opts1)
         make_cookbook(admin_user, cookbook_name2, cookbook_version2, opts2)
+        make_cookbook(admin_user, cookbook_name, cookbook_version, opts1)
         error_hash = {
           "message" => "Unable to satisfy constraints on package bar due to " +
                        "solution constraint (foo >= 0.0.0). Solution constraints " +
@@ -403,9 +404,11 @@ describe "Depsolver API endpoint", :depsolver do
         cb = retrieved_cookbook(cookbook_name, cookbook_version)
 
         meta = cb["metadata"]
-        meta.delete("attributes")
-        meta.delete("long_description")
+        #meta.delete("attributes")
+        #meta.delete("long_description")
         cb["metadata"] = meta
+
+	["attributes", "definitions", "files", "libraries", "providers", "recipes", "resources", "root_files", "templates"].each { |x| cb[x] = [] }
 
         post(api_url("/environments/#{env}/cookbook_versions"), normal_user,
               :payload => payload) do |response|
