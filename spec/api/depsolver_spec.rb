@@ -288,11 +288,18 @@ describe "Depsolver API endpoint", :depsolver do
           "message" => "Unable to satisfy constraints on package this_does_not_exist, " +
                        "which does not exist, due to solution constraint (foo >= 0.1.0). " +
                        "Solution constraints that may result in a constraint on this_does_not_exist: " +
+<<<<<<< HEAD
                        "[(foo = 1.2.3) -> (this_does_not_exist >= 0.0.0)]\n" +
 		       "Run list contains invalid items: no such cookbook #{not_exist_name}.",
           "most_constrained_cookbooks" => [],
           "non_existent_cookbooks" => ["this_does_not_exist"],
           "unsatisfiable_run_list_item" => "(foo >= 0.1.0)"
+=======
+                       "[(foo = 1.2.3) -> (this_does_not_exist >= 0.0.0)]",
+          "most_constrained_cookbooks" => [],
+          "non_existent_cookbooks" => ["this_does_not_exist"],
+           "unsatisfiable_run_list_item" => "(foo >= 0.0.0)"
+>>>>>>> 4976ab9ee6611f6cce2d55ddcd4367dd24c380fa
         }
         post(api_url("/environments/#{env}/cookbook_versions"), admin_user,
              :payload => payload) do |response|
@@ -346,9 +353,9 @@ describe "Depsolver API endpoint", :depsolver do
             "Unable to satisfy constraints on package bar due to solution constraint " +
             "(foo >= 0.0.0). Solution constraints that may result in a constraint on bar: " +
             "[(foo = 1.2.3) -> (bar > 2.0.0)]",
-          "unsatisfiable_run_list_item" => "(foo >= 0.0.0)",
+          "most_constrained_cookbooks" => ["bar = 2.0.0 -> []"],
           "non_existent_cookbooks" => [],
-          "most_constrained_cookbooks" => ["bar = 2.0.0 -> []"]
+          "unsatisfiable_run_list_item" => "(foo >= 0.0.0)"
         }
         post(api_url("/environments/#{env}/cookbook_versions"), admin_user,
              :payload => payload) do |response|
@@ -371,9 +378,9 @@ describe "Depsolver API endpoint", :depsolver do
           "message" => "Unable to satisfy constraints on package bar due to " +
                        "solution constraint (foo >= 0.0.0). Solution constraints " +
                        "that may result in a constraint on bar: [(foo = 1.2.3) -> (bar > 2.0.0)]",
-          "unsatisfiable_run_list_item" => "(foo >= 0.0.0)",
+          "most_constrained_cookbooks" => ["bar = 2.0.0 -> [(foo > 3.0.0)]"],
           "non_existent_cookbooks" => [],
-          "most_constrained_cookbooks" => ["bar = 2.0.0 -> [(foo > 3.0.0)]"]
+          "unsatisfiable_run_list_item" => "(foo >= 0.0.0)"
         }
         post(api_url("/environments/#{env}/cookbook_versions"), admin_user,
              :payload => payload) do |response|
