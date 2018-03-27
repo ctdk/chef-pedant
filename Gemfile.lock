@@ -56,3 +56,6 @@ PLATFORMS
 DEPENDENCIES
   chef-pedant!
   rest-client (~> 1.7.2)
+
+BUNDLED WITH
+   1.10.4
