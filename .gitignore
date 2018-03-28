@@ -13,3 +13,5 @@ fixtures/test_repository/dot_chef/*.rb
 fixtures/test_repository/admin_dot_chef/*.pem
 fixtures/test_repository/admin_dot_chef/*.rb
 fixtures/test_repository/data_bags/*.json
+
+pedant_config.rb
